@@ -4,6 +4,7 @@ from langchain_core.messages import HumanMessage,AIMessage
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.output_parsers import StrOutputParser
+import os
 
 load_dotenv()
 
@@ -19,7 +20,7 @@ def Get_Response(query,chat_history):
     
     prompt=ChatPromptTemplate.from_template(template)
     
-    LLM=ChatGoogleGenerativeAI()
+    LLM=ChatGoogleGenerativeAI(model="gemini-pro", google_api_key=os.getenv("GOOGLE_API_KEY"))
     chain=prompt | LLM | StrOutputParser()
     
     return chain.invoke({
