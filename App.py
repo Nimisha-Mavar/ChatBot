@@ -22,14 +22,12 @@ def Get_Response(query,chat_history):
     model = genai.GenerativeModel(model_name="gemini-1.5-pro")
     
     st.write("here")
-    response = model.generate_content([
-        {
-        "chat_history":chat_history,
-        "User_question":query
-        }, 
-        prompt
-    ])
-    return response
+    # Pass the combined prompt to the model
+    response = model.generate_content([{
+        "content": prompt
+    }])
+    
+    return response["text"]
     
 
 #Chat History
