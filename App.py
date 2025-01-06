@@ -12,14 +12,11 @@ st.title("ChatBot 🤖")
 
 #Get Response Function with Openai
 def Get_Response(query,chat_history):
-    template="""
+    prompt="""
     You are a helpful assistant, Aswer the following question considering the chat history.
     chat_history:{chat_history}
     User_question:{query}
     """
-    
-    prompt=ChatPromptTemplate.from_template(template)
-    
     LLM=ChatGoogleGenerativeAI(model="gemini-1.5-pro", google_api_key=os.getenv("GOOGLE_API_KEY"))
     chain=prompt | LLM | StrOutputParser()
     st.write("here")
