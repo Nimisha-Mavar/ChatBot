@@ -1,34 +1,31 @@
 import streamlit as st
 from dotenv import load_dotenv
 from langchain_core.messages import HumanMessage,AIMessage
-import google.generativeai as genai
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.output_parsers import StrOutputParser
-import os
 
 load_dotenv()
-
-genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
 
 st.title("ChatBot 🤖")
 
 #Get Response Function with Openai
 def Get_Response(query,chat_history):
-    prompt="""
+    template=f"""
     You are a helpful assistant, Aswer the following question considering the chat history.
     chat_history:{chat_history}
     User_question:{query}
     """
-    # Set up the model
-    model = genai.GenerativeModel(model_name="gemini-1.5-pro")
     
-    st.write("here")
-    # Pass the combined prompt to the model
-    response = model.generate_content([
-        {'chat_history': '', 'query': ""}, 
-        prompt
-    ])
+    prompt=ChatPromptTemplate.from_template(template)
     
-    return response["text"]
+    LLM=ChatGoogleGenerativeAI()
+    chain=prompt | LLM | StrOutputParser()
+    
+    return chain.invoke({
+        "chat_history":chat_history,
+        "User_question":query
+    })
     
 
 #Chat History
