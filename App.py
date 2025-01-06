@@ -23,10 +23,10 @@ def Get_Response(query,chat_history):
     
     st.write("here")
     # Pass the combined prompt to the model
-    response = model.generate_content([{
+    response = model.generate_content([
         {'chat_history': '', 'query': ""}, 
         prompt
-    }])
+    ])
     
     return response["text"]
     
