@@ -1,12 +1,13 @@
 import streamlit as st
 from dotenv import load_dotenv
 from langchain_core.messages import HumanMessage,AIMessage
-from langchain_core.prompts import ChatPromptTemplate
-from langchain_google_genai import ChatGoogleGenerativeAI
+import google.generativeai as genai
 from langchain_core.output_parsers import StrOutputParser
 import os
 
 load_dotenv()
+
+genai.configure(api_key=os.getenv("GOOGLE_API_KEY"))
 
 st.title("ChatBot 🤖")
 
@@ -17,13 +18,17 @@ def Get_Response(query,chat_history):
     chat_history:{chat_history}
     User_question:{query}
     """
-    LLM=ChatGoogleGenerativeAI(model="gemini-1.5-pro", google_api_key=os.getenv("GOOGLE_API_KEY"))
-    chain=prompt | LLM | StrOutputParser()
+    # Set up the model
+    model = genai.GenerativeModel(model_name="gemini-1.5-pro")
+    
     st.write("here")
-    return chain.invoke({
+    response = model.generate_content([
+        {
         "chat_history":chat_history,
         "User_question":query
-    })
+        }, 
+        prompt
+    ])
     
 
 #Chat History
