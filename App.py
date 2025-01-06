@@ -22,7 +22,7 @@ def Get_Response(query,chat_history):
     
     LLM=ChatGoogleGenerativeAI(model="gemini-pro", google_api_key=os.getenv("GOOGLE_API_KEY"))
     chain=prompt | LLM | StrOutputParser()
-    
+    st.write("here")
     return chain.invoke({
         "chat_history":chat_history,
         "User_question":query
