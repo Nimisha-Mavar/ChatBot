@@ -29,6 +29,7 @@ def Get_Response(query,chat_history):
         }, 
         prompt
     ])
+    return response
     
 
 #Chat History
