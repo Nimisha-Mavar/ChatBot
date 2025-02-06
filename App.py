@@ -1,57 +1,61 @@
 import streamlit as st
-from dotenv import load_dotenv
-from langchain_core.messages import HumanMessage,AIMessage
+from langchain_openai import ChatOpenAI
 from langchain_core.prompts import ChatPromptTemplate
-from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_core.output_parsers import StrOutputParser
 import os
+from dotenv import load_dotenv
 
+# Load environment variables
 load_dotenv()
 
-st.title("ChatBot 🤖")
+# Set API keys
+os.environ["OPENAI_API_KEY"] = os.getenv("OPENAI_API_KEY")
+os.environ["LANGCHAIN_API_KEY"] = os.getenv("LANGCHAIN_API_KEY")
+os.environ["LANGCHAIN_TRACING_V2"] = "true"  # Enables LangSmith tracing
 
-#Get Response Function with Openai
-def Get_Response(query,chat_history):
-    template=f"""
-    You are a helpful assistant, Aswer the following question considering the chat history.
-    chat_history:{chat_history}
-    User_question:{query}
-    """
-    
-    prompt=ChatPromptTemplate.from_template(template)
-    
-    LLM=ChatGoogleGenerativeAI(model="gemini-pro", google_api_key=os.getenv("GOOGLE_API_KEY"))
-    chain=prompt | LLM | StrOutputParser()
-    
-    return chain.invoke({
-        "chat_history":chat_history,
-        "User_question":query
-    })
-    
+# Initialize OpenAI Model with Streaming Enabled
+model = ChatOpenAI(model="gpt-4o", streaming=True)
 
-#Chat History
-if "Chat_History" not in st.session_state:
-    st.session_state.Chat_History=[]
+# Streamlit UI
+st.title("🤖 Chatbot 🤖")
+st.write("Ask me anything!")
 
-#Coverstation
-for message in st.session_state.Chat_History:
-    if isinstance(message,HumanMessage):
-        with st.chat_message("Human"):
-            st.markdown(message.content)
-    else:
-        with st.chat_message("AI"):
-            st.markdown(message.content)
+# Store chat history in session state
+if "messages" not in st.session_state:
+    st.session_state.messages = []
 
-#User Query
-User_Query=st.chat_input("Your Msg....")
-if User_Query is not None and User_Query!="":
-    st.session_state.Chat_History.append(HumanMessage(User_Query))
+# Display chat history
+for msg in st.session_state.messages:
+    with st.chat_message(msg["role"]):
+        st.markdown(msg["content"])
+
+# User input
+if prompt := st.chat_input("Ask me anything..."):
+    # Add user input to session state
+    st.session_state.messages.append({"role": "user", "content": prompt})
     
-    with st.chat_message("Human"):
-        st.markdown(User_Query)
-        
-    with st.chat_message("AI"):
-        Response=Get_Response(User_Query,st.session_state.Chat_History)
-        st.markdown(Response)
-    
-    st.session_state.Chat_History.append(AIMessage(Response))
+    # Display user message in chat UI
+    with st.chat_message("user"):
+        st.markdown(prompt)
+
+    # Define prompt template
+    prompt_template = ChatPromptTemplate.from_messages([
+        ("system", "You are a knowledgeable and friendly AI assistant."),
+        ("user", "{question}")
+    ])
+
+    # Create chain
+    chain = prompt_template | model | StrOutputParser()
+
+    # Display assistant response
+    with st.chat_message("assistant"):
+        response_container = st.empty()  # Placeholder for streaming text
+        full_response = ""
+
+        # Stream response as it is generated
+        for chunk in chain.stream({"question": prompt}):
+            full_response += chunk
+            response_container.markdown(full_response)  # Update response in real-time
+
+    # Save assistant response to chat history
+    st.session_state.messages.append({"role": "assistant", "content": full_response})
