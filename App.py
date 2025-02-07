@@ -14,7 +14,7 @@ os.environ["LANGCHAIN_API_KEY"] = os.getenv("LANGCHAIN_API_KEY")
 os.environ["LANGCHAIN_TRACING_V2"] = "true"  # Enables LangSmith tracing
 
 # Initialize OpenAI Model with Streaming Enabled
-model = ChatOpenAI(model="gpt-4o", streaming=True)
+model = ChatOpenAI(model="gpt-4o", streaming=True,max_completion_tokens=1000)
 
 # Streamlit UI
 st.title("🤖 Chatbot 🤖")
