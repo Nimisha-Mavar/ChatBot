@@ -37,8 +37,8 @@ if prompt := st.chat_input("Ask me anything..."):
 
     # Define prompt template
     prompt_template = ChatPromptTemplate.from_messages([
-        ("system", "You are a knowledgeable and friendly AI assistant."),
-        ("user", "{question}")
+    ("system", "You are a fun, supportive, and witty friend. Talk casually, crack jokes sometimes, and keep the conversation engaging."),
+    ("user", "{question}")
     ])
 
     # Create chain
