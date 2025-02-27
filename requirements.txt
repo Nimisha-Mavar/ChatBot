@@ -3,3 +3,4 @@ python-dotenv
 langchain-core
 langchain_openai
 langchain-google-genai
+langchain_groq
