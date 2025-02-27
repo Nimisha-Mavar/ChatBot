@@ -1,20 +1,17 @@
 import streamlit as st
-from langchain_openai import ChatOpenAI
+from langchain_groq import ChatGroq
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import StrOutputParser
 import os
-from dotenv import load_dotenv
 
-# Load environment variables
-load_dotenv()
+# Set API key from Streamlit secrets
+os.environ["GROQ_API_KEY"] = st.secrets["GROQ_API_KEY"]
 
-# Set API keys
-os.environ["OPENAI_API_KEY"] = os.getenv("OPENAI_API_KEY")
-os.environ["LANGCHAIN_API_KEY"] = os.getenv("LANGCHAIN_API_KEY")
-os.environ["LANGCHAIN_TRACING_V2"] = "true"  # Enables LangSmith tracing
+# Enable LangSmith tracing for debugging (optional)
+os.environ["LANGCHAIN_TRACING_V2"] = "true"  
 
-# Initialize OpenAI Model with Streaming Enabled
-model = ChatOpenAI(model="gpt-4o", streaming=True,max_completion_tokens=1000)
+# Initialize Groq Model with Streaming Enabled
+model = ChatGroq(model_name="mixtral-8x7b-32768", streaming=True, max_completion_tokens=1000)
 
 # Streamlit UI
 st.title("🤖 Chatbot 🤖")
